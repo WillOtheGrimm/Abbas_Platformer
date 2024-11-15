@@ -6,7 +6,7 @@ public class PlayerController : MonoBehaviour
 {
     
     Rigidbody2D rb;
-    public float speed;
+    public float acceleration;
     public float jumpHeight;
     FacingDirection currentDirection;
     public enum FacingDirection
@@ -36,12 +36,12 @@ public class PlayerController : MonoBehaviour
     private void MovementUpdate(Vector2 playerInput)
     {
         float inputX = Input.GetAxis("Horizontal");
-        rb.AddForce(new Vector2(inputX * speed, 0));
+        rb.AddForce(new Vector2(inputX * acceleration, 0));
 
         if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("jump");
-            rb.AddForce(new Vector2(0, 1 * jumpHeight));
+            rb.AddForce(new Vector2(0, 1 * jumpHeight), ForceMode2D.Impulse);
 
         }
 
@@ -64,7 +64,20 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
-        return true;
+        if (Physics2D.Raycast(transform.position, Vector2.down , 0.66f, LayerMask.GetMask("Ground")))
+        {
+            Debug.DrawRay(transform.position, Vector2.down * 0.66f, Color.red);
+            return true;
+
+        }
+
+
+
+
+
+
+
+        return false;
     }
 
 
