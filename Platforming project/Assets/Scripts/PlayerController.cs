@@ -38,12 +38,13 @@ public class PlayerController : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
         rb.AddForce(new Vector2(inputX * acceleration, 0));
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        /*if (Input.GetKeyDown(KeyCode.Space))
         {
             Debug.Log("jump");
             rb.AddForce(new Vector2(0, 1 * jumpHeight), ForceMode2D.Impulse);
 
-        }
+        }*/
+
 
         
 
