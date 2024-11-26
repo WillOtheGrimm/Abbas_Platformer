@@ -17,10 +17,10 @@ public class PlayerController : MonoBehaviour
     float gravity;
     public float gravityMultiplier, initialJumpVelMultiplier;
     float initialJumpVel;
-    float currentVel;
-    float yPosition;
+    /*float currentVel;
+    float yPosition;*/
 
-    int isNotGroundedValue;
+    bool hasJumped;
 
 
 
@@ -33,12 +33,10 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        yPosition = transform.position.y;
+        //yPosition = transform.position.y;
         
 
 
-        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
-        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
     }
 
@@ -50,14 +48,34 @@ public class PlayerController : MonoBehaviour
         Vector2 playerInput = new Vector2();
         MovementUpdate(playerInput);
 
+        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
         //Debug.Log(rb.gravityScale);
+    }
+
+
+    private void FixedUpdate()
+    {
+        if (hasJumped)
+        {
+            rb.AddForce(new Vector2(0, gravity));
+        }
+
+
     }
 
     private void MovementUpdate(Vector2 playerInput)
     {
         float inputX = Input.GetAxis("Horizontal");
         rb.AddForce(new Vector2(inputX * acceleration, 0));
+
+        if (inputX == 0 && IsGrounded())
+        {
+            rb.velocity = new Vector2 ( 0, rb.velocity.y);
+        }
+
+
 
         /*  if (Input.GetKeyDown(KeyCode.Space))
           {
@@ -69,23 +87,24 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space)  && IsGrounded())
         {
-            currentVel = initialJumpVel;
-            Debug.Log(currentVel);
-        }
-        else if (!IsGrounded())
-        {
-            isNotGroundedValue = 1;
+            rb.AddForce (new Vector2(0, initialJumpVel) , ForceMode2D.Impulse);
+            hasJumped = IsGrounded();
+           
+           // Debug.Log(currentVel);
         }
         else if (IsGrounded())
         {
-            isNotGroundedValue = 0;
-            currentVel = 0;
+            hasJumped = false;
             //yPosition = transform.position.y;
         }
+        else if (!IsGrounded())
+        {
+            hasJumped = true;
+        }
 
-            yPosition =   transform.position.y + currentVel * Time.deltaTime + 0.5f * gravity * isNotGroundedValue *  Time.deltaTime * Time.deltaTime  ;
-            transform.position = new Vector2 (transform.position.x,yPosition);
-            currentVel = currentVel + gravity * Time.deltaTime;
+          //  yPosition =   transform.position.y + currentVel * Time.deltaTime + 0.5f * gravity * isNotGroundedValue *  Time.deltaTime * Time.deltaTime  ;
+          //  transform.position = new Vector2 (transform.position.x,yPosition);
+          //currentVel = currentVel + gravity * Time.deltaTime;
 
             
 
