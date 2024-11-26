@@ -1788,6 +1788,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   acceleration: 3
   jumpHeight: 20
+  apexTime: 2
+  apexHeight: 3
+  gravityMultiplier: -1
+  initialJumpVelMultiplier: 8
 --- !u!1 &1598075209
 GameObject:
   m_ObjectHideFlags: 0
