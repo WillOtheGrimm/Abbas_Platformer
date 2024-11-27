@@ -35,6 +35,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
+
 
     }
 
@@ -45,9 +48,6 @@ public class PlayerController : MonoBehaviour
         //manage the actual movement of the character.
         Vector2 playerInput = new Vector2();
         MovementUpdate(playerInput);
-
-        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
-        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
         //Debug.Log(rb.gravityScale);
 
@@ -86,9 +86,6 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
         {
             rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
-            //hasJumped = IsGrounded();
-
-            // Debug.Log(currentVel);
         }
 
 
@@ -116,11 +113,11 @@ public class PlayerController : MonoBehaviour
 
         if (rb.velocity.y <= terminalSpeed)
         {
-            //Debug.Log(rb.velocity.y);
             rb.velocity = new Vector2(rb.velocity.x, terminalSpeed);
         }
+            Debug.Log(rb.velocity.y);
 
-        Debug.Log(hasJumped);
+        //Debug.Log(hasJumped);
 
 
     }
