@@ -85,6 +85,7 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
         {
+            Debug.Log("Jump!");
             rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
         }
 
