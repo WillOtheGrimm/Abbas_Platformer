@@ -1786,12 +1786,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86a1ce42ea3e3dd44868493ae73ec06d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 9
-  jumpHeight: 20
+  acceleration: 1.5
   apexTime: 0.8
-  apexHeight: 12
+  apexHeight: 10
   gravityMultiplier: -1.7
   initialJumpVelMultiplier: 1
+  coyoteTime: 0.35
+  terminalSpeed: -9
 --- !u!1 &1598075209
 GameObject:
   m_ObjectHideFlags: 0

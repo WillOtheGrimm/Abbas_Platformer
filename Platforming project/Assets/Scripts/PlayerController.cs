@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -8,7 +9,6 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody2D rb;
     public float acceleration;
-    public float jumpHeight;
     FacingDirection currentDirection;
 
     //Jumping mechanic
@@ -17,12 +17,14 @@ public class PlayerController : MonoBehaviour
     float gravity;
     public float gravityMultiplier, initialJumpVelMultiplier;
     float initialJumpVel;
-    /*float currentVel;
-    float yPosition;*/
-
     bool hasJumped;
 
+    public float coyoteTime;
+    float currentTime;
 
+
+    //task 2
+    public float terminalSpeed;
 
     public enum FacingDirection
     {
@@ -33,10 +35,6 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        //yPosition = transform.position.y;
-        
-
-
 
     }
 
@@ -52,6 +50,9 @@ public class PlayerController : MonoBehaviour
         initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
         //Debug.Log(rb.gravityScale);
+
+
+
     }
 
 
@@ -70,43 +71,57 @@ public class PlayerController : MonoBehaviour
         float inputX = Input.GetAxis("Horizontal");
         rb.AddForce(new Vector2(inputX * acceleration, 0));
 
-        if (inputX == 0 && IsGrounded())
+        /*if (inputX == 0 && IsGrounded())
         {
             rb.velocity = new Vector2 ( 0, rb.velocity.y);
-        }
+        }*/
+
+
+        //Debug.Log(coyoteTime);
 
 
 
-        /*  if (Input.GetKeyDown(KeyCode.Space))
-          {
-              Debug.Log("jump");
-              rb.AddForce(new Vector2(0, 1 * jumpHeight), ForceMode2D.Impulse);
-
-          }*/
 
 
-        if (Input.GetKeyDown(KeyCode.Space)  && IsGrounded())
+        if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
         {
-            rb.AddForce (new Vector2(0, initialJumpVel) , ForceMode2D.Impulse);
-            hasJumped = IsGrounded();
-           
-           // Debug.Log(currentVel);
+            rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
+            //hasJumped = IsGrounded();
+
+            // Debug.Log(currentVel);
         }
-        else if (IsGrounded())
+
+
+
+
+        if (IsGrounded())
         {
             hasJumped = false;
-            //yPosition = transform.position.y;
+
         }
         else if (!IsGrounded())
+
         {
-            hasJumped = true;
+            currentTime += Time.deltaTime;
+            if (currentTime >= coyoteTime)
+            {
+                hasJumped = true;
+                currentTime = 0;
+            }
+
+
         }
 
-          //  yPosition =   transform.position.y + currentVel * Time.deltaTime + 0.5f * gravity * isNotGroundedValue *  Time.deltaTime * Time.deltaTime  ;
-          //  transform.position = new Vector2 (transform.position.x,yPosition);
-          //currentVel = currentVel + gravity * Time.deltaTime;
 
-            
+
+        if (rb.velocity.y <= terminalSpeed)
+        {
+            //Debug.Log(rb.velocity.y);
+            rb.velocity = new Vector2(rb.velocity.x, terminalSpeed);
+        }
+
+        Debug.Log(hasJumped);
+
 
     }
 
@@ -123,18 +138,17 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
+
+
+
+
+
         if (Physics2D.Raycast(transform.position, Vector2.down, 0.66f, LayerMask.GetMask("Ground")))
         {
             Debug.DrawRay(transform.position, Vector2.down * 0.66f, Color.red);
             return true;
 
         }
-
-
-
-
-
-
 
         return false;
     }
