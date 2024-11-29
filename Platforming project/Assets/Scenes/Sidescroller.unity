@@ -1653,6 +1653,7 @@ GameObject:
   - component: {fileID: 1433354313}
   - component: {fileID: 1433354318}
   - component: {fileID: 1433354319}
+  - component: {fileID: 1433354321}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1725,8 +1726,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 1
-  m_AngularDrag: 0.05
+  m_LinearDrag: 0
+  m_AngularDrag: 0
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -1786,13 +1787,36 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 86a1ce42ea3e3dd44868493ae73ec06d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  acceleration: 1.5
-  apexTime: 0.8
-  apexHeight: 10
-  gravityMultiplier: -1.7
-  initialJumpVelMultiplier: 1
-  coyoteTime: 0.35
-  terminalSpeed: -9
+  apexTime: 1
+  apexHeight: 5
+  gravityMultiplier: -2
+  initialJumpVelMultiplier: 2
+  coyoteTime: 0
+  terminalSpeed: 0
+  accelerationTime: 1
+  decelerationTime: 2
+  maxSpeed: 5
+--- !u!114 &1433354321
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1433354312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 86a1ce42ea3e3dd44868493ae73ec06d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  apexTime: 1
+  apexHeight: 3
+  gravityMultiplier: -2
+  initialJumpVelMultiplier: 2
+  coyoteTime: 0
+  terminalSpeed: 0
+  accelerationTime: 1
+  decelerationTime: 0.5
+  maxSpeed: 5
 --- !u!1 &1598075209
 GameObject:
   m_ObjectHideFlags: 0

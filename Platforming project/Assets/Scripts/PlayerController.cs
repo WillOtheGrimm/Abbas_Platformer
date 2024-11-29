@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
 {
 
     Rigidbody2D rb;
-    public float acceleration;
     FacingDirection currentDirection;
 
     //Jumping mechanic
@@ -17,7 +16,7 @@ public class PlayerController : MonoBehaviour
     float gravity;
     public float gravityMultiplier, initialJumpVelMultiplier;
     float initialJumpVel;
-    bool hasJumped;
+    bool isJumping = false;
 
     public float coyoteTime;
     float currentTime;
@@ -26,17 +25,29 @@ public class PlayerController : MonoBehaviour
     //task 2
     public float terminalSpeed;
 
+
+
+
+    public float accelerationTime;
+    public float decelerationTime;
+    public float maxSpeed;
+
+    float acceleration;
+    float deceleration;
+
     public enum FacingDirection
     {
         left, right
     }
 
-    // Start is called before the first frame update
+    // Start is called before the first fr`ame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
-        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
+        acceleration = maxSpeed / accelerationTime;
+        deceleration = maxSpeed / decelerationTime;
+
+
 
 
     }
@@ -44,81 +55,183 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
+
+
+
+
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
         //manage the actual movement of the character.
-        Vector2 playerInput = new Vector2();
-        MovementUpdate(playerInput);
+        //Vector2 playerInput = new Vector2();
+        //MovementUpdate(playerInput);
 
         //Debug.Log(rb.gravityScale);
 
 
+
+        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
+        {
+            isJumping = true;
+        }
+
+
+        Debug.Log(rb.velocity.x);
 
     }
 
 
     private void FixedUpdate()
     {
-        if (hasJumped)
+        /* if (isJumping)
+         {
+             rb.AddForce(new Vector2(0, gravity));
+         }*/
+
+
+
+
+        Vector2 playerInput = new Vector2();
+        if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
-            rb.AddForce(new Vector2(0, gravity));
+            playerInput += Vector2.left;
         }
+        if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
+        {
+            playerInput += Vector2.right;
+        }
+
+
+
+
+        MovementUpdate(playerInput);
+
+
+
 
 
     }
 
     private void MovementUpdate(Vector2 playerInput)
     {
-        float inputX = Input.GetAxis("Horizontal");
-        rb.AddForce(new Vector2(inputX * acceleration, 0));
 
-        /*if (inputX == 0 && IsGrounded())
+        Vector2 velocity = rb.velocity;
+
+
+        //This handles the movement by adding acceleration when it receives an input.
+        if (playerInput.x != 0)
         {
-            rb.velocity = new Vector2 ( 0, rb.velocity.y);
-        }*/
-
-
-        //Debug.Log(coyoteTime);
-
-
-
-
-
-        if (Input.GetKeyDown(KeyCode.Space) && !hasJumped)
+            velocity += playerInput * acceleration * Time.fixedDeltaTime;
+        }
+        //If no input start decelerating.
+        else if (playerInput.x == 0)
         {
-            Debug.Log("Jump!");
-            rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
+            velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
+
+            //Make sure that in velocity is low, it just sets it to 0
+                if (velocity.x < 0.15f && velocity.x > -0.15f)
+                {
+                    velocity.x = 0;
+                }
         }
 
 
 
 
-        if (IsGrounded())
+
+
+
+
+        if (isJumping)
         {
-            hasJumped = false;
-
-        }
-        else if (!IsGrounded())
-
-        {
-            currentTime += Time.deltaTime;
-            if (currentTime >= coyoteTime)
-            {
-                hasJumped = true;
-                currentTime = 0;
-            }
-
-
+            velocity.y = initialJumpVel;
         }
 
-
-
-        if (rb.velocity.y <= terminalSpeed)
+        if (!IsGrounded())
         {
-            rb.velocity = new Vector2(rb.velocity.x, terminalSpeed);
+            velocity.y += gravity * Time.fixedDeltaTime;
         }
-            Debug.Log(rb.velocity.y);
 
-        //Debug.Log(hasJumped);
+        //This handles terminal velocity
+        if (velocity.y <= terminalSpeed)
+        {
+            velocity.y = terminalSpeed;
+        }
+
+
+
+
+
+        //This sets my velocity to the vector velocity
+        rb.velocity = velocity;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        /*float inputX = Input.GetAxis("Horizontal");
+        rb.AddForce(new Vector2(inputX * acceleration, 0));*/
+
+
+
+
+
+
+        /*   if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
+           {
+               Debug.Log("Jump!");
+               rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
+           }
+
+
+
+
+           if (IsGrounded())
+           {
+               isJumping = false;
+
+           }
+           else if (!IsGrounded())
+
+           {
+               currentTime += Time.deltaTime;
+               if (currentTime >= coyoteTime)
+               {
+                   isJumping = true;
+                   currentTime = 0;
+               }
+
+
+           }
+
+
+
+               Debug.Log(rb.velocity.y);
+   */
+        //Debug.Log(isJumping);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     }
