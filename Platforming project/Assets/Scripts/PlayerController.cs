@@ -18,8 +18,8 @@ public class PlayerController : MonoBehaviour
     float initialJumpVel;
     bool isJumping = false;
 
+    
     public float coyoteTime;
-    float currentTime;
 
 
     //task 2
@@ -34,6 +34,10 @@ public class PlayerController : MonoBehaviour
 
     float acceleration;
     float deceleration;
+    bool canJump = false;
+
+    Vector2 velocity;
+    public float dashingDistance;
 
     public enum FacingDirection
     {
@@ -55,10 +59,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
+
         gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
         initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
-
-
 
 
         //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
@@ -70,28 +74,28 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (IsGrounded() && Input.GetKeyDown(KeyCode.Space))
+        if (canJump && Input.GetKeyDown(KeyCode.Space))
         {
             isJumping = true;
+            canJump = false;
         }
 
 
-        Debug.Log(rb.velocity.x);
+        
+
+
+        //Debug.Log(rb.velocity.x);
+
+
+
+
 
     }
 
 
     private void FixedUpdate()
     {
-        /* if (isJumping)
-         {
-             rb.AddForce(new Vector2(0, gravity));
-         }*/
-
-
-
-
-        Vector2 playerInput = new Vector2();
+       Vector2 playerInput = new Vector2();
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             playerInput += Vector2.left;
@@ -115,7 +119,7 @@ public class PlayerController : MonoBehaviour
     private void MovementUpdate(Vector2 playerInput)
     {
 
-        Vector2 velocity = rb.velocity;
+        velocity = rb.velocity;
 
 
         //This handles the movement by adding acceleration when it receives an input.
@@ -129,7 +133,7 @@ public class PlayerController : MonoBehaviour
             velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
 
             //Make sure that in velocity is low, it just sets it to 0
-                if (velocity.x < 0.15f && velocity.x > -0.15f)
+                if (velocity.x < 0.30f && velocity.x > -0.30f)
                 {
                     velocity.x = 0;
                 }
@@ -141,22 +145,59 @@ public class PlayerController : MonoBehaviour
 
 
 
+        ////////////////////////////////////////////////////COYOTE TIME ///////////////////////////////////////////////////
 
-        if (isJumping)
+
+
+
+
+      /*  if (velocity.y <= terminalSpeed)
+        {
+            velocity.y = terminalSpeed;
+        }*/
+        Debug.Log(velocity.y);
+
+
+
+
+        if (isJumping && canJump)
         {
             velocity.y = initialJumpVel;
+            isJumping = false;
+            //canJump = false;
         }
+
+
 
         if (!IsGrounded())
         {
-            velocity.y += gravity * Time.fixedDeltaTime;
+            coyoteTime -= Time.fixedDeltaTime;
+            if (coyoteTime <= 0 )
+            {
+                canJump = false;
+            }
+            else if (coyoteTime >= 0 && !isJumping)
+            {
+                canJump = true;
+            }
+        }
+        
+        if (IsGrounded())
+        {
+        canJump = true;
+        coyoteTime = 0.3f;
         }
 
-        //This handles terminal velocity
-        if (velocity.y <= terminalSpeed)
+
+
+        if (Input.GetKeyDown(KeyCode.LeftShift))
+        velocity.y += gravity * Time.fixedDeltaTime;
         {
-            velocity.y = terminalSpeed;
+          // Dashing();
         }
+
+
+
 
 
 
@@ -164,73 +205,6 @@ public class PlayerController : MonoBehaviour
 
         //This sets my velocity to the vector velocity
         rb.velocity = velocity;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        /*float inputX = Input.GetAxis("Horizontal");
-        rb.AddForce(new Vector2(inputX * acceleration, 0));*/
-
-
-
-
-
-
-        /*   if (Input.GetKeyDown(KeyCode.Space) && !isJumping)
-           {
-               Debug.Log("Jump!");
-               rb.AddForce(new Vector2(0, initialJumpVel), ForceMode2D.Impulse);
-           }
-
-
-
-
-           if (IsGrounded())
-           {
-               isJumping = false;
-
-           }
-           else if (!IsGrounded())
-
-           {
-               currentTime += Time.deltaTime;
-               if (currentTime >= coyoteTime)
-               {
-                   isJumping = true;
-                   currentTime = 0;
-               }
-
-
-           }
-
-
-
-               Debug.Log(rb.velocity.y);
-   */
-        //Debug.Log(isJumping);
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -283,4 +257,18 @@ public class PlayerController : MonoBehaviour
 
 
     }
+
+
+
+
+    /* public void Dashing()
+     {
+         Debug.Log("Dashing");
+         velocity.x += dashingDistance;
+
+
+
+     }
+ */
+
 }
