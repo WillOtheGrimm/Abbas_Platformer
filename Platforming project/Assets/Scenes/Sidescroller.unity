@@ -1787,7 +1787,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   apexTime: 0.5
-  apexHeight: 3
+  apexHeight: 4
   coyoteTime: 0.3
   terminalHorizontalSpeed: 9
   accelerationTime: 1
@@ -1840,7 +1840,7 @@ GameObject:
   - component: {fileID: 1977641121}
   - component: {fileID: 1977641120}
   m_Layer: 0
-  m_Name: head_cracked_option
+  m_Name: Skull
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1969,7 +1969,7 @@ Transform:
   m_GameObject: {fileID: 1977641119}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.16, y: 3.57, z: 0}
+  m_LocalPosition: {x: 3.387, y: 3.802, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
