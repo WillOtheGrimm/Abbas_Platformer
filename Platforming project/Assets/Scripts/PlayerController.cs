@@ -12,9 +12,9 @@ public class PlayerController : MonoBehaviour
 
     //Jumping mechanic
     public float apexTime;
-    public float apexHeight;
+    public float apexHeight = 5;
     float gravity;
-    public float gravityMultiplier, initialJumpVelMultiplier;
+    float gravityMultiplier = -2, initialJumpVelMultiplier = 2;
     float initialJumpVel;
     bool isJumping = false;
 
@@ -23,8 +23,8 @@ public class PlayerController : MonoBehaviour
 
 
     //task 2
-    public float terminalSpeed;
-
+    float terminalSpeed = -5;
+    public float terminalHorizontalSpeed;
 
 
 
@@ -36,8 +36,20 @@ public class PlayerController : MonoBehaviour
     float deceleration;
     bool canJump = false;
 
-    Vector2 velocity;
+    //Vector2 velocity;
+    bool isDashing = false;
     public float dashingDistance;
+
+
+    public float dashingTime;
+
+
+
+
+    float variableJumpTime = 0;
+
+
+
 
     public enum FacingDirection
     {
@@ -74,21 +86,34 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (canJump && Input.GetKeyDown(KeyCode.Space))
+        if (canJump && Input.GetKey(KeyCode.Space))
         {
-            isJumping = true;
-            canJump = false;
+
+            
+            variableJumpTime += Time.deltaTime;
+
+            if (variableJumpTime >= 1)
+            {
+                variableJumpTime = 1;
+            }
+            Debug.Log(variableJumpTime);
         }
 
 
-        
+        if (canJump && Input.GetKeyUp(KeyCode.Space))
+        {
+            //Debug.Log("key release");
+            isJumping = true;
+            canJump = false;
+
+        }
 
 
-        //Debug.Log(rb.velocity.x);
 
-
-
-
+            if (Input.GetKeyDown(KeyCode.LeftShift)  && !IsGrounded())
+        {
+            isDashing = true;
+        }
 
     }
 
@@ -98,11 +123,11 @@ public class PlayerController : MonoBehaviour
        Vector2 playerInput = new Vector2();
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
-            playerInput += Vector2.left;
+            playerInput = Vector2.left;
         }
         if (Input.GetKey(KeyCode.RightArrow) || Input.GetKey(KeyCode.D))
         {
-            playerInput += Vector2.right;
+            playerInput = Vector2.right;
         }
 
 
@@ -113,13 +138,13 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+       //Debug.Log(playerInput.ToString());
     }
 
     private void MovementUpdate(Vector2 playerInput)
     {
 
-        velocity = rb.velocity;
+        Vector2 velocity = rb.velocity;
 
 
         //This handles the movement by adding acceleration when it receives an input.
@@ -128,7 +153,7 @@ public class PlayerController : MonoBehaviour
             velocity += playerInput * acceleration * Time.fixedDeltaTime;
         }
         //If no input start decelerating.
-        else if (playerInput.x == 0)
+        else 
         {
             velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
 
@@ -144,6 +169,25 @@ public class PlayerController : MonoBehaviour
 
 
 
+        if (isJumping )
+        {
+            if (variableJumpTime < 0.2)
+            {
+                velocity.y += initialJumpVel * variableJumpTime + 2;
+            }
+
+
+            velocity.y += initialJumpVel * variableJumpTime;
+            if(IsGrounded())
+            {
+                variableJumpTime = 0;
+            }
+            isJumping = false;
+            //canJump = false;
+
+
+
+        }
 
         ////////////////////////////////////////////////////COYOTE TIME ///////////////////////////////////////////////////
 
@@ -151,21 +195,15 @@ public class PlayerController : MonoBehaviour
 
 
 
-      /*  if (velocity.y <= terminalSpeed)
+        if (velocity.y < terminalSpeed)
         {
             velocity.y = terminalSpeed;
-        }*/
-        Debug.Log(velocity.y);
-
-
-
-
-        if (isJumping && canJump)
-        {
-            velocity.y = initialJumpVel;
-            isJumping = false;
-            //canJump = false;
         }
+        //Debug.Log(velocity.y);
+
+
+
+
 
 
 
@@ -180,27 +218,79 @@ public class PlayerController : MonoBehaviour
             {
                 canJump = true;
             }
+
+        velocity.y += gravity * Time.fixedDeltaTime;
+
         }
-        
+
         if (IsGrounded())
         {
         canJump = true;
         coyoteTime = 0.3f;
+        isDashing = false;
+        //variableJumpTime = 0;
         }
 
 
 
-        if (Input.GetKeyDown(KeyCode.LeftShift))
-        velocity.y += gravity * Time.fixedDeltaTime;
+       
+        //---------------------------------------Dashing--------------------------------------------------
+
+        if (isDashing)
         {
-          // Dashing();
+
+            Debug.Log("Dashing");
+
+            dashingTime -= Time.deltaTime;
+            if(dashingTime <=0 )
+            {
+                velocity.x = 0;
+                isDashing = false;
+                dashingTime = 0.19f;
+            }
+
+
+            if(velocity.x < 0)
+            {
+
+            velocity.x -= dashingDistance;
+                /*if (velocity.x <= -terminalHorizontalSpeed)
+                {
+                    velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
+                    isDashing = false;
+                }*/
+            }
+
+
+            else if(velocity.x > 0 )
+            {
+                velocity.x += dashingDistance;
+                /*if (velocity.x >= terminalHorizontalSpeed)
+                {
+                    velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
+                }*/
+
+
+            }
+
+
+
+           
+
         }
 
+            /*if (velocity.x > 0 && velocity.x > terminalHorizontalSpeed && isDashing)
+            {
+                velocity.x = 0;
+                isDashing = false;
+            }
+            else if (velocity.x < 0 && velocity.x < -terminalHorizontalSpeed && isDashing)
+            {
+                velocity.x = 0;
+                isDashing = false;
+            }*/
 
-
-
-
-
+       // Debug.Log(velocity.x);
 
 
         //This sets my velocity to the vector velocity
@@ -228,9 +318,9 @@ public class PlayerController : MonoBehaviour
 
 
 
-        if (Physics2D.Raycast(transform.position, Vector2.down, 0.66f, LayerMask.GetMask("Ground")))
+        if (Physics2D.Raycast(transform.position, Vector2.down, 0.72f, LayerMask.GetMask("Ground")))
         {
-            Debug.DrawRay(transform.position, Vector2.down * 0.66f, Color.red);
+            Debug.DrawRay(transform.position, Vector2.down * 0.72f, Color.red);
             return true;
 
         }
@@ -261,14 +351,6 @@ public class PlayerController : MonoBehaviour
 
 
 
-    /* public void Dashing()
-     {
-         Debug.Log("Dashing");
-         velocity.x += dashingDistance;
-
-
-
-     }
- */
+    
 
 }
