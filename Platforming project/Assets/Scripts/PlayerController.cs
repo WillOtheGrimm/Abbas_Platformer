@@ -18,27 +18,31 @@ public class PlayerController : MonoBehaviour
     float initialJumpVel;
     bool isJumping = false;
 
-    
+    //Variable for coyote Time
     public float coyoteTime;
 
 
-    //task 2
+    //Variable for the terminal speed
     float terminalSpeed = -5;
-    public float terminalHorizontalSpeed;
 
 
-
+    //Variable for the player movement speed
     public float accelerationTime;
     public float decelerationTime;
     public float maxSpeed;
-
     float acceleration;
     float deceleration;
-    bool canJump = false;
 
-    //Vector2 velocity;
+
+
+    //To check if player can and is jumping
+    bool canJump = false;
     bool isDashing = false;
-    public float dashingDistance;
+
+
+
+
+    public float dashingForce;
 
 
     public float dashingTime;
@@ -49,7 +53,7 @@ public class PlayerController : MonoBehaviour
     float variableJumpTime = 0;
 
 
-
+    bool endJump = false;
 
     public enum FacingDirection
     {
@@ -59,12 +63,17 @@ public class PlayerController : MonoBehaviour
     // Start is called before the first fr`ame update
     void Start()
     {
+        //Get a reference to the rigidBody
         rb = GetComponent<Rigidbody2D>();
+
+        //Handles the math for the speed (acceleration and deceleration) 
         acceleration = maxSpeed / accelerationTime;
         deceleration = maxSpeed / decelerationTime;
 
 
-
+        //Handles the math for both the gravity and the jump velocity 
+        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
+        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
     }
 
@@ -73,19 +82,9 @@ public class PlayerController : MonoBehaviour
     {
 
 
-        gravity = gravityMultiplier * apexHeight / Mathf.Pow(apexTime, 2);
-        initialJumpVel = initialJumpVelMultiplier * apexHeight / apexTime;
 
 
-        //The input from the player needs to be determined and then passed in the to the MovementUpdate which should
-        //manage the actual movement of the character.
-        //Vector2 playerInput = new Vector2();
-        //MovementUpdate(playerInput);
-
-        //Debug.Log(rb.gravityScale);
-
-
-
+        //Check if player can jump and is pressing space
         if (canJump && Input.GetKey(KeyCode.Space))
         {
 
@@ -100,12 +99,18 @@ public class PlayerController : MonoBehaviour
         }
 
 
-        if (canJump && Input.GetKeyUp(KeyCode.Space))
+        if (canJump && Input.GetKeyDown(KeyCode.Space))
         {
+            
+
             //Debug.Log("key release");
             isJumping = true;
             canJump = false;
 
+        }
+        if (Input.GetKeyUp(KeyCode.Space)  && rb.velocity.y > 0)
+        {
+            endJump = true;
         }
 
 
@@ -143,7 +148,7 @@ public class PlayerController : MonoBehaviour
 
     private void MovementUpdate(Vector2 playerInput)
     {
-
+        //Vector to hold the value of the players current velocity
         Vector2 velocity = rb.velocity;
 
 
@@ -168,20 +173,26 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+        //This handles the jump 
         if (isJumping )
         {
-            if (variableJumpTime < 0.2)
-            {
-                velocity.y += initialJumpVel * variableJumpTime + 2;
-            }
+
+            /* if (variableJumpTime < 0.2)
+             {
+                 velocity.y += initialJumpVel * variableJumpTime + 4;
+             } 
+ */
+
+            canJump = false;
+            velocity.y += initialJumpVel;
 
 
-            velocity.y += initialJumpVel * variableJumpTime;
-            if(IsGrounded())
+
+
+           /* if(IsGrounded())
             {
                 variableJumpTime = 0;
-            }
+            }*/
             isJumping = false;
             //canJump = false;
 
@@ -189,6 +200,14 @@ public class PlayerController : MonoBehaviour
 
         }
 
+
+
+        if (endJump)
+        {
+            velocity.y = velocity.y / 2;
+            endJump = false;
+
+        }
         ////////////////////////////////////////////////////COYOTE TIME ///////////////////////////////////////////////////
 
 
@@ -244,7 +263,6 @@ public class PlayerController : MonoBehaviour
             dashingTime -= Time.deltaTime;
             if(dashingTime <=0 )
             {
-                velocity.x = 0;
                 isDashing = false;
                 dashingTime = 0.19f;
             }
@@ -253,7 +271,7 @@ public class PlayerController : MonoBehaviour
             if(velocity.x < 0)
             {
 
-            velocity.x -= dashingDistance;
+            velocity.x = -dashingForce;
                 /*if (velocity.x <= -terminalHorizontalSpeed)
                 {
                     velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
@@ -264,7 +282,7 @@ public class PlayerController : MonoBehaviour
 
             else if(velocity.x > 0 )
             {
-                velocity.x += dashingDistance;
+                velocity.x = dashingForce;
                 /*if (velocity.x >= terminalHorizontalSpeed)
                 {
                     velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
