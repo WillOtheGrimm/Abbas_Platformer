@@ -41,18 +41,16 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+    //Variable to control the distance for the dash
     public float dashingForce;
-
-
     public float dashingTime;
 
 
 
-
+    //Variable to keep track of how long the space key was pressed
     float variableJumpTime = 0;
 
-
+    //Bool to check when space was released
     bool endJump = false;
 
     public enum FacingDirection
@@ -88,7 +86,7 @@ public class PlayerController : MonoBehaviour
         if (canJump && Input.GetKey(KeyCode.Space))
         {
 
-            
+            //Keeping track of time when space is pressed.
             variableJumpTime += Time.deltaTime;
 
             if (variableJumpTime >= 1)
@@ -98,15 +96,13 @@ public class PlayerController : MonoBehaviour
             Debug.Log(variableJumpTime);
         }
 
-
+        //To ensure that the player pressed space and was still able to jump
         if (canJump && Input.GetKeyDown(KeyCode.Space))
         {
-            
-
-            //Debug.Log("key release");
             isJumping = true;
             canJump = false;
 
+        //Check if space was release to make the player start falling
         }
         if (Input.GetKeyUp(KeyCode.Space)  && rb.velocity.y > 0)
         {
@@ -114,7 +110,7 @@ public class PlayerController : MonoBehaviour
         }
 
 
-
+        //Make sure the player is in the air and press left shift for dash
             if (Input.GetKeyDown(KeyCode.LeftShift)  && !IsGrounded())
         {
             isDashing = true;
@@ -125,6 +121,7 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate()
     {
+        //This handles the player movement by adding the directional vectors depending on the input.
        Vector2 playerInput = new Vector2();
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
@@ -143,7 +140,6 @@ public class PlayerController : MonoBehaviour
 
 
 
-       //Debug.Log(playerInput.ToString());
     }
 
     private void MovementUpdate(Vector2 playerInput)
@@ -176,28 +172,10 @@ public class PlayerController : MonoBehaviour
         //This handles the jump 
         if (isJumping )
         {
-
-            /* if (variableJumpTime < 0.2)
-             {
-                 velocity.y += initialJumpVel * variableJumpTime + 4;
-             } 
- */
-
             canJump = false;
             velocity.y += initialJumpVel;
-
-
-
-
-           /* if(IsGrounded())
-            {
-                variableJumpTime = 0;
-            }*/
             isJumping = false;
-            //canJump = false;
-
-
-
+           
         }
 
 
@@ -208,17 +186,15 @@ public class PlayerController : MonoBehaviour
             endJump = false;
 
         }
+
+
         ////////////////////////////////////////////////////COYOTE TIME ///////////////////////////////////////////////////
 
-
-
-
-
+        //Thois is to set a terminal speed so that the player can't accelerate forever.
         if (velocity.y < terminalSpeed)
         {
             velocity.y = terminalSpeed;
         }
-        //Debug.Log(velocity.y);
 
 
 
