@@ -102,16 +102,16 @@ public class PlayerController : MonoBehaviour
             isJumping = true;
             canJump = false;
 
-        //Check if space was release to make the player start falling
+            //Check if space was release to make the player start falling
         }
-        if (Input.GetKeyUp(KeyCode.Space)  && rb.velocity.y > 0)
+        if (Input.GetKeyUp(KeyCode.Space) && rb.velocity.y > 0)
         {
             endJump = true;
         }
 
 
         //Make sure the player is in the air and press left shift for dash
-            if (Input.GetKeyDown(KeyCode.LeftShift)  && !IsGrounded())
+        if (Input.GetKeyDown(KeyCode.LeftShift) && !IsGrounded())
         {
             isDashing = true;
         }
@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
     private void FixedUpdate()
     {
         //This handles the player movement by adding the directional vectors depending on the input.
-       Vector2 playerInput = new Vector2();
+        Vector2 playerInput = new Vector2();
         if (Input.GetKey(KeyCode.LeftArrow) || Input.GetKey(KeyCode.A))
         {
             playerInput = Vector2.left;
@@ -134,7 +134,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+        //calls the movement method
         MovementUpdate(playerInput);
 
 
@@ -154,15 +154,15 @@ public class PlayerController : MonoBehaviour
             velocity += playerInput * acceleration * Time.fixedDeltaTime;
         }
         //If no input start decelerating.
-        else 
+        else
         {
             velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
 
             //Make sure that in velocity is low, it just sets it to 0
-                if (velocity.x < 0.30f && velocity.x > -0.30f)
-                {
-                    velocity.x = 0;
-                }
+            if (velocity.x < 0.30f && velocity.x > -0.30f)
+            {
+                velocity.x = 0;
+            }
         }
 
 
@@ -170,16 +170,16 @@ public class PlayerController : MonoBehaviour
 
 
         //This handles the jump 
-        if (isJumping )
+        if (isJumping)
         {
             canJump = false;
             velocity.y += initialJumpVel;
             isJumping = false;
-           
+
         }
 
 
-
+        //Reduces the velocity if key is released
         if (endJump)
         {
             velocity.y = velocity.y / 2;
@@ -190,7 +190,7 @@ public class PlayerController : MonoBehaviour
 
         ////////////////////////////////////////////////////COYOTE TIME ///////////////////////////////////////////////////
 
-        //Thois is to set a terminal speed so that the player can't accelerate forever.
+        //This is to set a terminal speed so that the player can't accelerate forever.
         if (velocity.y < terminalSpeed)
         {
             velocity.y = terminalSpeed;
@@ -201,11 +201,11 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+        //if player is off ground , countdown for coyotee time
         if (!IsGrounded())
         {
             coyoteTime -= Time.fixedDeltaTime;
-            if (coyoteTime <= 0 )
+            if (coyoteTime <= 0)
             {
                 canJump = false;
             }
@@ -213,79 +213,35 @@ public class PlayerController : MonoBehaviour
             {
                 canJump = true;
             }
-
-        velocity.y += gravity * Time.fixedDeltaTime;
+            //This line handle the gravity
+            velocity.y += gravity * Time.fixedDeltaTime;
 
         }
-
+        //This mreset the coyote time, and the bool to know if you can jump / dash
         if (IsGrounded())
         {
-        canJump = true;
-        coyoteTime = 0.3f;
-        isDashing = false;
-        //variableJumpTime = 0;
+            canJump = true;
+            coyoteTime = 0.3f;
+            isDashing = false;
         }
 
 
-
-       
         //---------------------------------------Dashing--------------------------------------------------
-
         if (isDashing)
         {
-
-            Debug.Log("Dashing");
-
-            dashingTime -= Time.deltaTime;
-            if(dashingTime <=0 )
+            //Check if player is currently going left
+            if (velocity.x < 0)
             {
-                isDashing = false;
-                dashingTime = 0.19f;
+                velocity.x = -dashingForce;
             }
 
-
-            if(velocity.x < 0)
-            {
-
-            velocity.x = -dashingForce;
-                /*if (velocity.x <= -terminalHorizontalSpeed)
-                {
-                    velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
-                    isDashing = false;
-                }*/
-            }
-
-
-            else if(velocity.x > 0 )
+            //check if player is going right
+            else if (velocity.x > 0)
             {
                 velocity.x = dashingForce;
-                /*if (velocity.x >= terminalHorizontalSpeed)
-                {
-                    velocity.x += Mathf.Sign(velocity.x) * -1 * deceleration * Time.fixedDeltaTime;
-                }*/
-
-
             }
-
-
-
-           
 
         }
-
-            /*if (velocity.x > 0 && velocity.x > terminalHorizontalSpeed && isDashing)
-            {
-                velocity.x = 0;
-                isDashing = false;
-            }
-            else if (velocity.x < 0 && velocity.x < -terminalHorizontalSpeed && isDashing)
-            {
-                velocity.x = 0;
-                isDashing = false;
-            }*/
-
-       // Debug.Log(velocity.x);
-
 
         //This sets my velocity to the vector velocity
         rb.velocity = velocity;
@@ -293,7 +249,7 @@ public class PlayerController : MonoBehaviour
 
 
     }
-
+    //Method to check if player is walking which would update the sprite
     public bool IsWalking()
     {
         if (Input.GetAxis("Horizontal") != 0)
@@ -304,14 +260,9 @@ public class PlayerController : MonoBehaviour
     }
 
 
-
+    //Method to check if player is grounded 
     public bool IsGrounded()
     {
-
-
-
-
-
         if (Physics2D.Raycast(transform.position, Vector2.down, 0.72f, LayerMask.GetMask("Ground")))
         {
             Debug.DrawRay(transform.position, Vector2.down * 0.72f, Color.red);
@@ -324,7 +275,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-
+    //Method that returns the direction the player is facing depending on input
     public FacingDirection GetFacingDirection()
     {
 
@@ -337,14 +288,5 @@ public class PlayerController : MonoBehaviour
             currentDirection = FacingDirection.left;
         }
         return currentDirection;
-
-
-
     }
-
-
-
-
-    
-
 }
